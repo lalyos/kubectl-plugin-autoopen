@@ -1,0 +1,15 @@
+#!/bin/bash
+
+[[ "$KUBECTL_PLUGINS_LOCAL_FLAG_DEBUG" != "false" ]] && set -x
+
+export MINI=$(minikube ip)
+
+kubectl get svc \
+    --watch-only \
+    -o jsonpath='{.spec.ports[0].nodePort}{"\n"}' \
+    | while read PORT; do
+	 sleep ${SLEEP:-3}
+         if curl $MINI:$PORT &>/dev/null ; then
+	     open http://$MINI:$PORT
+	 fi
+      done
